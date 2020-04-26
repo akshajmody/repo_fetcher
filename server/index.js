@@ -9,23 +9,27 @@ let app = express();
 
 app.use(cors());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded());
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static(__dirname + '/../client/dist'));
 
 app.post('/repos', function (req, res) {
   console.log(`POST REQUEST FOR ${req.body.term}`);
   getReposByUsername(req, res, (err, response, body) => {
-    console.log('GET REPOS FOR' + req.body.term);
-    if(err) {
-      console.log(err)
+    console.log('GET REPOS FOR ' + req.body.term);
+    const info = JSON.parse(body);
+    if(err || info.message === 'Not Found') {
+      console.log("API error: " + err)
+      res.sendStatus(404)
     } else {
-      const info = JSON.parse(body);
+      console.log(response.statusCode,'from Github API');
+      console.log(response.headers['x-ratelimit-remaining'], ' requests remaining')
       save(info, (err, data) => {
         if(err) {
-          console.log(err);
+          console.log("SAVING error" + err);
+          res.sentStatus(500);
         } else {
-          res.send('sent');
-          console.log(data);
+          console.log('SAVED TO DATABASE!')
+          res.sendStatus(200);
         }
       })
     }

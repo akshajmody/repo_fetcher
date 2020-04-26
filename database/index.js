@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/fetcher', {useNewUrlParser: true});
+mongoose.connect('mongodb://localhost/fetcher', {useNewUrlParser: true,useUnifiedTopology: true});
 
 var db = mongoose.connection;
 db.once('open', function() {
@@ -11,7 +11,8 @@ let repoSchema = mongoose.Schema({
   //owner.login
   repoId: Number, //repo ID
   username: String, //username
-  full_name: String,
+  //TESTING UNIQUE ENTRIES ONLY
+  full_name: {type: String, unique: true, dropDups: true},
   //repo full name example : akshajmody/toy_problems
   html_url: String, //repo URL
   forks_count: Number //number of forks
@@ -25,13 +26,14 @@ let save = (repoData, callback) => {
     var oneRepo = {};
     oneRepo = {
       "repoId": repoData[i].id,
-      "username": repoData[i].name,
+      "username": repoData[i].owner.login,
       "full_name": repoData[i].full_name,
       "html_url": repoData[i].html_url,
       "forks_count": repoData[i].forks_count
     };
     var newDoc = new Repo(oneRepo);
     newDoc.save()
+    console.log(newDoc)
   };
   callback();
 }
@@ -59,40 +61,4 @@ module.exports = {
 // db.repositories.find().sort({forks: 1}).limit(25)
 // db.repositories.find().forEach(function(doc){print('Blog Posts: ' + doc.title)})
 
-// db.posts.insert({
-//   title: 'Posts',
-//   body: 'Body of post 1',
-//   category: 'News',
-//   likes: 4,
-//   forks: 10,
-//   tags: ['news', 'events'],
-//   user: {
-//     name: 'John Doe',
-//     status: 'author'
-//   },
-//   date: Date()
-// })
-
-// db.posts.insertMany([
-//   {title: 'Posts',
-//   body: 'Body of post 3',
-//   likes: 7,
-//   forks: 16,
-//   tags: ['news', 'events'],
-//   user: {
-//     name: 'John Doe',
-//     status: 'author'
-//   },
-//   date: Date()},
-//   {title: 'Posts',
-//   body: 'Body of post 2',
-//   likes: 1,
-//   forks: 5,
-//   tags: ['sports', 'weather'],
-//   user: {
-//     name: 'Jim Bob',
-//     status: 'reporter'
-//   },
-//   date: Date()}
-// ])
 
