@@ -46,6 +46,7 @@ class App extends React.Component {
       data: {term: term},
       success: () => {
         console.log('CLIENT POST SUCCESS');
+        //avoid this. functions within arrow functions
         this.getAll();
       },
       error: () => {

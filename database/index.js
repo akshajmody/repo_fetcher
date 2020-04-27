@@ -34,12 +34,13 @@ let save = (repoData, callback) => {
     };
     var newDoc = new Repo(oneRepo);
     newDoc.save()
-    console.log(newDoc)
+    console.log("newdoc:" + newDoc)
     added.push(newDoc);
   };
   console.log("DOCUMENTS ADDED: " + added.length)
   callback();
 }
+//BULK WRITE - PROMISE ALL
 
 let getTopTwentyFive = (callback) => {
   Repo.find({}).limit(25).sort({'forks_count': -1}).exec((err, topforks) => {
