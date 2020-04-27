@@ -8,18 +8,35 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      repos: []
+      repos: [],
+      topRepos: []
     }
     this.search=this.search.bind(this);
+    this.getAll=this.getAll.bind(this);
   }
-//PUSH TO REPOS IN STATE
 
-//AJAX REQUESTS
+  componentDidMount() {
+    this.getAll();
+  };
 
-//component did mount - after item renders to screen
 
+  getAll() {
+    // TODO
+    $.ajax({
+      url: 'http://127.0.0.1:1128/repos',
+      type: "GET",
+      success: (requestedData) => {
+        this.setState({
+          repos: requestedData,
+          topRepos: requestedData.slice(0, 25)
+        });
+      },
+      error: () => {
+        console.log('CLIENT GET ERROR')
+      }
+    });
+  }
 
-//USE
   search (term) {
     console.log(`${term} was searched`);
     // TODO
@@ -28,19 +45,22 @@ class App extends React.Component {
       type: "POST",
       data: {term: term},
       success: () => {
-        console.log('CLIENT POST SUCCESS')
+        console.log('CLIENT POST SUCCESS');
+        this.getAll();
       },
       error: () => {
-        console.log('CLIENT POST ERROR')
+        console.log('CLIENT POST ERROR');
       }
     });
   }
 
+
+
   render () {
     return (<div>
       <h1>Github Fetcher</h1>
-      <RepoList repos={this.state.repos}/>
       <Search onSearch={this.search.bind(this)}/>
+      <RepoList repos={this.state.repos} topRepos={this.state.topRepos}/>
     </div>)
   }
 }

@@ -22,6 +22,7 @@ let Repo = mongoose.model('Repo', repoSchema);
 
 
 let save = (repoData, callback) => {
+  var added = [];
   for(var i=0; i<repoData.length; i++) {
     var oneRepo = {};
     oneRepo = {
@@ -34,18 +35,37 @@ let save = (repoData, callback) => {
     var newDoc = new Repo(oneRepo);
     newDoc.save()
     console.log(newDoc)
+    added.push(newDoc);
   };
+  console.log("DOCUMENTS ADDED: " + added.length)
   callback();
 }
 
-let getTopTwentyFive = () => {
+let getTopTwentyFive = (callback) => {
+  Repo.find({}).limit(25).sort({'forks_count': -1}).exec((err, topforks) => {
+    if (err) {
+      callback(err, null);
+    } else {
+      callback(null, topforks);
+    }
+  })
+};
 
-}
+let getAllRepos = (callback) => {
+  Repo.find({}).sort({'forks_count': -1}).exec((err, allRepos) => {
+    if (err) {
+      callback(err, null);
+    } else {
+      callback(null, allRepos);
+    }
+  })
+};
 
 
 module.exports = {
   save: save,
-  getTopTwentyFive: getTopTwentyFive
+  getTopTwentyFive: getTopTwentyFive,
+  getAllRepos: getAllRepos
 }
 
 

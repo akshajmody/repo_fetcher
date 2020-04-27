@@ -16,9 +16,7 @@ let getReposByUsername = (req, res, callback) => {
 
     }
   };
-
   request(options, callback)
-
 }
 
 module.exports.getReposByUsername = getReposByUsername;

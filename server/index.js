@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser=require('body-parser');
 const cors = require('cors');
 const path=require('path');
-const getTopTwentyFive=require(path.join(__dirname,'..','database','index.js')).getTopTwentyFive;
+const db=require(path.join(__dirname,'..','database','index.js'))
 const save=require(path.join(__dirname,'..','database','index.js')).save;
 const getReposByUsername=require(path.join(__dirname,'..','helpers','github.js')).getReposByUsername;
 let app = express();
@@ -15,8 +15,7 @@ app.use(express.static(__dirname + '/../client/dist'));
 app.post('/repos', function (req, res) {
   console.log(`POST REQUEST FOR ${req.body.term}`);
   getReposByUsername(req, res, (err, response, body) => {
-    console.log('GET REPOS FOR ' + req.body.term);
-    const info = JSON.parse(body);
+    var info = JSON.parse(body);
     if(err || info.message === 'Not Found') {
       console.log("API error: " + err)
       res.sendStatus(404)
@@ -26,7 +25,7 @@ app.post('/repos', function (req, res) {
       save(info, (err, data) => {
         if(err) {
           console.log("SAVING error" + err);
-          res.sentStatus(500);
+          res.sendStatus(500);
         } else {
           console.log('SAVED TO DATABASE!')
           res.sendStatus(200);
@@ -37,7 +36,16 @@ app.post('/repos', function (req, res) {
 });
 
 app.get('/repos', function (req, res) {
-
+  console.log('GET INVOKED')
+  db.getAllRepos((err, allRepoes) => {
+    if (err) {
+      console.log('GET ALL REPOES ERROR: ' + err);
+      res.sendStatus(500);
+    } else {
+      console.log('GETTING ALL REPOS!');
+      res.send(allRepoes);
+    }
+  })
 });
 
 let port = 1128;
